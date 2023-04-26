@@ -1,0 +1,11 @@
+{
+  "version": "0.1",
+  "domain": "lampsmartpro",
+  "name": "LampSmartPro",
+  "documentation": "https://github.com/keith-kl/homeassistant-lampsmartpro/",
+  "issue_tracker": "https://github.com/keith-kl/homeassistant-lampsmartpro/issues",
+  "config_flow": false,
+  "codeowners": ["@keith-kl"],
+  "iot_class": "local_polling",
+  "loggers": ["lampsmartpro"]
+}
