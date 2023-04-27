@@ -49,12 +49,8 @@ def normalize_value(value: int, max: int, new_max: int) -> int:
     return int(value * new_max / max)
 
 class LampSmartPro(LightEntity):
-
     min_color_temp_kelvin = 3000
     max_color_temp_kelvin = 6400
-
-    _attr_unique_id = "lelight_light"
-
     supported_color_modes = {
         ColorMode.ONOFF,
         ColorMode.BRIGHTNESS,
@@ -72,6 +68,7 @@ class LampSmartPro(LightEntity):
 
         #color temp from 3000 to 6400 (device format)
         self._color_temp = 6400
+        _LOGGER.info("initialized")
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -121,42 +118,43 @@ class LampSmartPro(LightEntity):
         return self._is_on
 
     def turn_on(self, **kwargs: Any) -> None:
-        _LOGGER.info("turn on %s", kwargs)
+        _LOGGER.debug("Rung setup pairing %s", kwargs)
+        self._api.setup()
+        
+        _LOGGER.debug("turn on %s", kwargs)
+        self._api.turn_on()
         self._api.turn_on()
         self._is_on = True
         if ATTR_BRIGHTNESS in kwargs:
             self._brightness = normalize_value(kwargs[ATTR_BRIGHTNESS], 255, 9)
-            _LOGGER.info("set brightness to %s", self._brightness)
+            _LOGGER.debug("set brightness to %s", self._brightness)
         if ATTR_COLOR_TEMP_KELVIN in kwargs:
             self._color_temp = kwargs[ATTR_COLOR_TEMP_KELVIN]
-            _LOGGER.info("set color temp to %sK", self._color_temp)
+            _LOGGER.debug("set color temp to %sK", self._color_temp)
 
         if self._color_temp < 4000:
             #warm
-            _LOGGER.info("warm %s", self._brightness)
+            _LOGGER.debug("warm %s", self._brightness)
             ret = self._api.warm(self._brightness)
         elif self._color_temp > 5000:
             #cold
-            _LOGGER.info("cold %s", self._brightness)
+            _LOGGER.debug("cold %s", self._brightness)
             ret = self._api.cold(self._brightness)
         else:
             #dual
-            _LOGGER.info("dual %s", self._brightness)
+            _LOGGER.debug("dual %s", self._brightness)
             ret = self._api.dual(self._brightness)
-        _LOGGER.info("turn on ret=%s", ret)
+        _LOGGER.debug("turn on ret=%s", ret)
        
     def turn_off(self, **kwargs: Any) -> None:
         """Instruct the light to turn off."""
-        _LOGGER.info("turn off %s", kwargs)
+        _LOGGER.debug("turn off %s", kwargs)
         ret = self._api.turn_off()
         self._is_on = False
-        _LOGGER.info("turn off ret=%s", ret)
+        _LOGGER.debug("turn off ret=%s", ret)
 
     def update_state(self, attrs):
-        _LOGGER.info("update state event to %s", attrs)
+        _LOGGER.debug("update state event to %s", attrs)
 
     def update(self) -> None:
-        _LOGGER.info("update")
-        ret = self._api.setup()
-        _LOGGER.info("setup ret=%s", ret)
-        
+        _LOGGER.debug("update")
