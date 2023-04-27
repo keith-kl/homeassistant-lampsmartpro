@@ -15,6 +15,8 @@ light:
     name: NAME_HERE
 ```
 
+The integration will try to pair the BLE light when it is turned on. Keep turning on and off the light from the frontend until the light goes off and on and this indicates that the pairing is completed.
+
 ## Dependencies
 This is the list of packages providing the files required. Be aware that package names usually do vary across different linux distributions.
 
