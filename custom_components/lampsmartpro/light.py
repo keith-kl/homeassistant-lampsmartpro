@@ -97,7 +97,7 @@ class LampSmartPro(LightEntity):
         This method is optional. Removing it indicates to Home Assistant
         that brightness is not supported for this light.
         """
-        return normalize_value(self._brightness, 9, 255)
+        return self._brightness
 
     @property
     def color_mode(self) -> ColorMode | None:
