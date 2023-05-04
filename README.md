@@ -25,7 +25,7 @@ Debian / Ubuntu
 - libbluetooth-dev
 - lampify
 
-This custom component contains a wrapper shared libary from a CLI C program Lampify from another author (https://github.com/MasterDevX/lampify)
+This custom component contains a wrapper shared libary **liblampify.so** from a CLI C program Lampify from another author (https://github.com/MasterDevX/lampify). I have forked a custom version to remove the notification library dependency (https://github.com/keith-kl/liblampify). This shared library is compile in Raspberry pi. If it does not work, you may want to compile the shared library in your system instead.
 
 ## Compatibility
 This was tested with a BLE ceiling light from Taobao which uses the below iOS/Andriod app to control. 
