@@ -118,34 +118,36 @@ class LampSmartPro(LightEntity):
         return self._is_on
 
     def turn_on(self, **kwargs: Any) -> None:
-        _LOGGER.debug("Rung setup pairing %s", kwargs)
+        _LOGGER.debug("Run setup pairing %s", kwargs)
         self._api.setup()
         
         _LOGGER.debug("turn on %s", kwargs)
         self._api.turn_on()
-        self._api.turn_on()
         self._is_on = True
+        
+        brightness_unit = normalize_value(self._brightness, 255, 9);
+        
         if ATTR_BRIGHTNESS in kwargs:
-            self._brightness = normalize_value(kwargs[ATTR_BRIGHTNESS], 255, 9)
-            _LOGGER.debug("set brightness to %s", self._brightness)
+            self._brightness = kwargs[ATTR_BRIGHTNESS]
+            brightness_unit = normalize_value(kwargs[ATTR_BRIGHTNESS], 255, 9)
+            _LOGGER.debug("set brightness to %s", brightness_unit)
         if ATTR_COLOR_TEMP_KELVIN in kwargs:
             self._color_temp = kwargs[ATTR_COLOR_TEMP_KELVIN]
             _LOGGER.debug("set color temp to %sK", self._color_temp)
-
         if self._color_temp < 4000:
             #warm
-            _LOGGER.debug("warm %s", self._brightness)
-            ret = self._api.warm(self._brightness)
+            _LOGGER.debug("warm %s", brightness_unit)
+            ret = self._api.warm(brightness_unit)
         elif self._color_temp > 5000:
             #cold
-            _LOGGER.debug("cold %s", self._brightness)
-            ret = self._api.cold(self._brightness)
+            _LOGGER.debug("cold %s", brightness_unit)
+            ret = self._api.cold(brightness_unit)
         else:
             #dual
-            _LOGGER.debug("dual %s", self._brightness)
-            ret = self._api.dual(self._brightness)
+            _LOGGER.debug("dual %s", brightness_unit)
+            ret = self._api.dual(brightness_unit)
         _LOGGER.debug("turn on ret=%s", ret)
-       
+        
     def turn_off(self, **kwargs: Any) -> None:
         """Instruct the light to turn off."""
         _LOGGER.debug("turn off %s", kwargs)
