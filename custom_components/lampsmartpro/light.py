@@ -51,7 +51,7 @@ def normalize_value(value: int, max: int, new_max: int) -> int:
 class LampSmartPro(LightEntity):
     min_color_temp_kelvin = 3000
     max_color_temp_kelvin = 6400
-    supported_color_modes = {
+    _attr_supported_color_modes = {
         ColorMode.ONOFF,
         ColorMode.BRIGHTNESS,
         ColorMode.COLOR_TEMP,
