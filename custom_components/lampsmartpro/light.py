@@ -11,7 +11,8 @@ from homeassistant.components.light import (ATTR_BRIGHTNESS,
                                             ATTR_COLOR_TEMP_KELVIN,
                                             PLATFORM_SCHEMA,
                                             ColorMode,
-                                            LightEntity)
+                                            LightEntity,
+                                            filter_supported_color_modes)
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, EVENT_HOMEASSISTANT_STOP
@@ -51,11 +52,7 @@ def normalize_value(value: int, max: int, new_max: int) -> int:
 class LampSmartPro(LightEntity):
     min_color_temp_kelvin = 3000
     max_color_temp_kelvin = 6400
-    _attr_supported_color_modes = {
-        ColorMode.ONOFF,
-        ColorMode.BRIGHTNESS,
-        ColorMode.COLOR_TEMP,
-    }
+    
 
     def __init__(self, name, api) -> None:
         """Initialize"""
@@ -65,9 +62,15 @@ class LampSmartPro(LightEntity):
 
         #brightness from 0 to 255 (device format)
         self._brightness = 255
-
+        
+        self._attr_color_mode = ColorMode.COLOR_TEMP
+        self._attr_supported_color_modes = set()
+        
+        self._attr_supported_color_modes.add(ColorMode.COLOR_TEMP)
+        
+        
         #color temp from 3000 to 6400 (device format)
-        self._color_temp = 6400
+        self._color_temp_kelvin = 6400
         _LOGGER.info("initialized")
 
     @property
@@ -104,12 +107,16 @@ class LampSmartPro(LightEntity):
         return ColorMode.COLOR_TEMP
 
     @property
+    def supported_color_mode(self) -> Set[ColorMode] | None:
+        return {ColorMode.COLOR_TEMP}
+        
+    @property
     def color_temp_kelvin(self) -> int | None:
         """Return the color temperature of the light.
         This method is optional. Removing it indicates to Home Assistant
         that color_temp is not supported for this light.
         """
-        return self._color_temp
+        return self._color_temp_kelvin
 
 
     @property
@@ -132,13 +139,13 @@ class LampSmartPro(LightEntity):
             brightness_unit = normalize_value(kwargs[ATTR_BRIGHTNESS], 255, 9)
             _LOGGER.debug("set brightness to %s", brightness_unit)
         if ATTR_COLOR_TEMP_KELVIN in kwargs:
-            self._color_temp = kwargs[ATTR_COLOR_TEMP_KELVIN]
-            _LOGGER.debug("set color temp to %sK", self._color_temp)
-        if self._color_temp < 4000:
+            self._color_temp_kelvin = kwargs[ATTR_COLOR_TEMP_KELVIN]
+            _LOGGER.debug("set color temp to %sK", self._color_temp_kelvin)
+        if self._color_temp_kelvin < 4000:
             #warm
             _LOGGER.debug("warm %s", brightness_unit)
             ret = self._api.warm(brightness_unit)
-        elif self._color_temp > 5000:
+        elif self._color_temp_kelvin > 5000:
             #cold
             _LOGGER.debug("cold %s", brightness_unit)
             ret = self._api.cold(brightness_unit)
@@ -160,3 +167,4 @@ class LampSmartPro(LightEntity):
 
     def update(self) -> None:
         _LOGGER.debug("update")
+
